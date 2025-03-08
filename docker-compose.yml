@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  nextjs-app:
+    container_name: nextjs-container
+    build: .
+    expose:
+      - "3000"  # Pastikan Next.js bisa diakses internal oleh Nginx
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=https://api.jikan.moe/v4
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-container
+    depends_on:
+      - nextjs-app
+    ports:
+      - "80:80"  # Mengarahkan trafik dari luar ke Nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # Gunakan konfigurasi Nginx kustom
+    restart: unless-stopped
